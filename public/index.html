@@ -49,15 +49,16 @@
         const data = await res.json();
 
         if (data.error) {
-          resultDiv.innerHTML = `<p style="color:red;">${data.error}</p>`;
-        } else {
-          resultDiv.innerHTML = `
-            <h3>Phone: ${phone}</h3>
-            <p>✅ Delivered: <strong>${data.success}</strong></p>
-            <p>❌ Cancelled: <strong>${data.cancel}</strong></p>
-            <p>↩️ Returned: <strong>${data.return}</strong></p>
-          `;
-        }
+  resultDiv.innerHTML = `<p style="color:red;">${data.error}</p>`;
+} else {
+  resultDiv.innerHTML = `
+    <h3>Phone: ${phone}</h3>
+    <p>✅ Delivered: <strong>${data.data.success}</strong></p>
+    <p>❌ Cancelled: <strong>${data.data.cancel}</strong></p>
+    <p>↩️ Returned: <strong>${data.data.return}</strong></p>
+  `;
+}
+
       } catch (err) {
         resultDiv.innerHTML = '<p style="color:red;">Error fetching data.</p>';
       }
