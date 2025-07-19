@@ -33,36 +33,40 @@
   <button onclick="checkCourier()">Search</button>
   <div class="result" id="result"></div>
 
-  <script>
-    async function checkCourier() {
-      const phone = document.getElementById('phone').value;
-      const resultDiv = document.getElementById('result');
-      if (!phone) {
-        resultDiv.innerHTML = '<p style="color:red;">Please enter a phone number.</p>';
-        return;
-      }
-
-      resultDiv.innerHTML = 'Checking...';
-
-      try {
-        const res = await fetch(`/api/check?phone=${phone}`);
-        const data = await res.json();
-
-        if (data.error) {
-  resultDiv.innerHTML = `<p style="color:red;">${data.error}</p>`;
-} else {
-  resultDiv.innerHTML = `
-    <h3>Phone: ${phone}</h3>
-    <p>✅ Delivered: <strong>${data.data.success}</strong></p>
-    <p>❌ Cancelled: <strong>${data.data.cancel}</strong></p>
-    <p>↩️ Returned: <strong>${data.data.return}</strong></p>
-  `;
-}
-
-      } catch (err) {
-        resultDiv.innerHTML = '<p style="color:red;">Error fetching data.</p>';
-      }
+<script>
+  async function checkCourier() {
+    const phone = document.getElementById('phone').value;
+    const resultDiv = document.getElementById('result');
+    if (!phone) {
+      resultDiv.innerHTML = '<p style="color:red;">Please enter a phone number.</p>';
+      return;
     }
-  </script>
+
+    resultDiv.innerHTML = 'Checking...';
+
+    try {
+      const res = await fetch(`/api/check?phone=${phone}`);
+      const data = await res.json();
+      console.log('API response:', data); // 👈 Debug line
+
+      if (data.error || !data.data) {
+        resultDiv.innerHTML = `<p style="color:red;">${data.error || 'Invalid response'}</p>`;
+      } else {
+        const { success, cancel, return: returned } = data.data;
+
+        resultDiv.innerHTML = `
+          <h3>Phone: ${phone}</h3>
+          <p>✅ Delivered: <strong>${success}</strong></p>
+          <p>❌ Cancelled: <strong>${cancel}</strong></p>
+          <p>↩️ Returned: <strong>${returned}</strong></p>
+        `;
+      }
+    } catch (err) {
+      console.error('Fetch error:', err);
+      resultDiv.innerHTML = '<p style="color:red;">Error fetching data.</p>';
+    }
+  }
+</script>
+
 </body>
 </html>
