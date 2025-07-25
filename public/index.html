@@ -1,480 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ফ্রড কাস্টমার চেক - FraudChecker BD</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f2f5; /* Light gray background */
-            padding: 20px;
-            color: #333;
-        }
-        .container-fluid {
-            max-width: 1200px;
-            margin: auto;
-        }
-        .header-section {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between; /* Distribute items */
-        }
-        .logo-section {
-            display: flex;
-            align-items: center;
-            flex: 1; /* Allows it to take available space */
-        }
-        .logo-box {
-            background-color: #28a745; /* Green background for logo */
-            color: white;
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-size: 28px;
-            font-weight: bold;
-            letter-spacing: -1px;
-            margin-right: 15px;
-            min-width: 120px; /* To prevent squishing */
-            text-align: center;
-        }
-        .logo-text {
-            font-size: 24px;
-            font-weight: bold;
-            color: #28a745; /* Green text for "ফ্রডচেকার" */
-        }
-        .search-input-group {
-            flex: 2; /* Allows it to take more space */
-            display: flex; /* For input and button side-by-side */
-            max-width: 600px; /* Limit search bar width */
-        }
-        .search-input-group .form-control {
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
-            border-color: #ced4da; /* Default border color */
-        }
-        .search-input-group .btn {
-            border-top-left-radius: 0;
-            border-bottom-left-radius: 0;
-            background-color: #28a745; /* Green search button */
-            border-color: #28a745;
-        }
-        .search-input-group .btn:hover {
-            background-color: #218838;
-            border-color: #1e7e34;
-        }
-        .main-content {
-            display: flex;
-            gap: 20px;
-        }
-        .left-panel {
-            flex: 1; /* Takes 1 part of available space */
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            text-align: center;
-            min-width: 280px; /* Ensure it doesn't get too small */
-        }
-        .right-panel {
-            flex: 3; /* Takes 3 parts of available space */
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .summary-card {
-            background-color: #fff;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-            text-align: center;
-            border: 1px solid #e9ecef;
-        }
-        .summary-card h6 {
-            font-size: 1rem;
-            margin-bottom: 5px;
-            color: #555;
-        }
-        .summary-card .value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #28a745; /* Default green */
-        }
-        .summary-card .icon {
-            font-size: 2rem;
-            color: #007bff;
-            margin-bottom: 10px;
-        }
-
-        /* Specific colors for summary cards */
-        .summary-card.total-order .value, .summary-card.total-order .icon { color: #007bff; /* Blue */ }
-        .summary-card.total-delivered .value, .summary-card.total-delivered .icon { color: #28a745; /* Green */ }
-        .summary-card.total-cancelled .value, .summary-card.total-cancelled .icon { color: #dc3545; /* Red */ }
-        .summary-card.delivery-rate .value, .summary-card.delivery-rate .icon { color: #6c757d; /* Gray */ }
-
-
-        .circular-progress {
-            position: relative;
-            height: 180px;
-            width: 180px;
-            border-radius: 50%;
-            background-color: #e6e6e6; /* Base background for the circle */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 20px auto;
-            /* Using conic-gradient for the progress bar */
-            background: conic-gradient(#28a745 var(--progress), #dc3545 var(--progress));
-        }
-        .circular-progress::before {
-            content: "";
-            position: absolute;
-            height: 150px;
-            width: 150px;
-            background-color: #fff;
-            border-radius: 50%;
-        }
-        .progress-value {
-            position: relative;
-            font-size: 2.2rem;
-            font-weight: bold;
-            color: #28a745; /* Green for success rate */
-            z-index: 1;
-        }
-        .progress-label {
-            position: relative;
-            font-size: 0.9rem;
-            color: #555;
-            z-index: 1;
-            margin-top: 5px;
-        }
-        
-
-        .table-section {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-        }
-        .table thead th {
-            background-color: #f8f9fa;
-            color: #555;
-        }
-        .table tbody tr td img.courier-logo {
-            width: 25px;
-            height: 25px;
-            margin-right: 8px;
-            object-fit: contain;
-        }
-        .status-message {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 5px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            justify-content: center; /* Center the message content */
-        }
-        .status-message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .footer-text {
-            text-align: center;
-            margin-top: 30px;
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-        .hidden {
-            display: none !important;
-        }
-        .spinner-border {
-            width: 1.2rem;
-            height: 1.2rem;
-            margin-right: 0.5rem;
-        }
-        @media (max-width: 768px) {
-            .main-content {
-                flex-direction: column;
-            }
-            .search-input-group {
-                flex-direction: column;
-                max-width: none;
-            }
-            .search-input-group .form-control,
-            .search-input-group .btn {
-                border-radius: 0.375rem; /* Revert corner radius for single column */
-                margin-bottom: 10px; /* Add space between input and button */
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ফ্রড কাস্টমার চেক</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f0f0f0;
+      padding: 40px;
+      text-align: center;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      margin: 5px;
+    }
+    .result {
+      margin-top: 20px;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+    }
+    .courier {
+      border-bottom: 1px solid #ddd;
+      padding: 10px 0;
+    }
+    .courier img {
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+  </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="text-center mb-3" id="topMessage">
-            <span class="badge bg-success py-2 px-3">
-                <i class="fas fa-check-circle me-2"></i> বাংলাদেশর NO.1 FRAUD CHECKING SYSTEM!
-            </span>
-        </div>
-        <h2 class="text-center mb-4" id="fraudTagline">
-            ফেইক অর্ডার চিহ্নিত করে পার্সেল রিটার্নের হার কমিয়ে দিন!
-        </h2>
-        <p class="text-center text-muted mb-4" id="deliveredCountMessage">
-            <span class="badge bg-success">
-                <i class="fas fa-truck-loading"></i> মোট ডেলিভারি কোম্পানিতে চেক করা হবে
-            </span>
-        </p>
+  <h1>📦ফ্রড কাস্টমার চেক</h1>
+  <input type="text" id="phone" placeholder="Enter phone number..." />
+  <button onclick="checkCourier()">Search</button>
+  <div class="result" id="result"></div>
 
-        <div class="header-section">
-            <div class="logo-section">
-                <div class="logo-box">F</div>
-                <div class="logo-text">ফ্রডচেকার</div>
+  <script>
+    async function checkCourier() {
+      const phone = document.getElementById('phone').value;
+      const resultDiv = document.getElementById('result');
+      if (!phone) {
+        resultDiv.innerHTML = '<p style="color:red;">Please enter a phone number.</p>';
+        return;
+      }
+
+      resultDiv.innerHTML = '🔄 Checking...';
+
+      try {
+        const res = await fetch(`/api/check?phone=${phone}`);
+        const data = await res.json();
+
+        if (data.status !== 'success' || !data.courierData) {
+          resultDiv.innerHTML = `<p style="color:red;">Invalid response</p>`;
+          return;
+        }
+
+        const courierData = data.courierData;
+        resultDiv.innerHTML = `<h3>📱 Phone: ${phone}</h3><hr/>`;
+
+        Object.keys(courierData).forEach(key => {
+          if (key === "summary") return;
+
+          const c = courierData[key];
+          resultDiv.innerHTML += `
+            <div class="courier">
+              <img src="${c.logo}" width="40" />
+              <strong>${c.name}</strong><br/>
+              📦 Total: ${c.total_parcel}<br/>
+              ✅ Success: ${c.success_parcel}<br/>
+              ❌ Cancelled: ${c.cancelled_parcel}<br/>
+              🔢 Success Rate: ${c.success_ratio}%
             </div>
-            <div class="search-input-group">
-                <input type="text" id="phoneNumber" class="form-control" placeholder="মোবাইল নম্বর দিন" aria-label="Phone number">
-                <button class="btn btn-primary" type="button" id="searchBtn">
-                    <i class="fas fa-search me-2"></i> Search
-                </button>
-            </div>
-        </div>
-
-        <div class="alert alert-info text-center mt-3 hidden" id="phoneNumberResultStatus">
-            </div>
-
-        <div class="main-content mt-4 hidden" id="mainResultContent">
-            <div class="left-panel">
-                <h5 class="mb-3">Delivery Success Ratio</h5>
-                <div class="circular-progress" style="--progress: 0%;">
-                    <div class="progress-value" id="deliveryRatioValue">0.0%</div>
-                    <div class="progress-label" id="deliveryRatioLabel"></div>
-                </div>
-            </div>
-
-            <div class="right-panel">
-                <div class="summary-grid">
-                    <div class="summary-card total-order">
-                        <div class="icon"><i class="fas fa-shopping-cart"></i></div>
-                        <h6>মোট অর্ডার</h6>
-                        <div class="value" id="totalOrders">0</div>
-                    </div>
-                    <div class="summary-card total-delivered">
-                        <div class="icon"><i class="fas fa-truck"></i></div>
-                        <h6>মোট ডেলিভারি</h6>
-                        <div class="value" id="totalDelivered">0</div>
-                    </div>
-                    <div class="summary-card total-cancelled">
-                        <div class="icon"><i class="fas fa-times-circle"></i></div>
-                        <h6>মোট বাতিল</h6>
-                        <div class="value" id="totalCancelled">0</div>
-                    </div>
-                    <div class="summary-card delivery-rate">
-                        <div class="icon"><i class="fas fa-percent"></i></div>
-                        <h6>ডেলিভারি রেট</h6>
-                        <div class="value" id="deliveryRate">0%</div>
-                    </div>
-                </div>
-
-                <div class="table-section">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>কুরিয়ার</th>
-                                    <th>অর্ডার</th>
-                                    <th>ডেলিভারি</th>
-                                    <th>বাতিল</th>
-                                    <th>ডেলিভারি %</th>
-                                </tr>
-                            </thead>
-                            <tbody id="courierTableBody">
-                                <tr id="noDataRow" class="hidden">
-                                    <td colspan="5" class="text-center text-muted py-4">এই নম্বরের জন্য কোন ডেটা পাওয়া যায়নি।</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="footer-text mt-5">
-            <div class="status-message success" id="footerSuccessMessage">
-                <i class="fas fa-check-circle"></i> আমাদের সার্ভিস থেকে উপকৃত হলে, অবশ্যই আমাদের Facebook পেজ ও একটি লাইক দেবেন <a href="#" target="_blank">FraudChecker BD</a>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script> 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initial state based on before.png
-            // These elements are initially visible
-            document.getElementById('topMessage').classList.remove('hidden');
-            document.getElementById('fraudTagline').classList.remove('hidden');
-            document.getElementById('deliveredCountMessage').classList.remove('hidden');
-            document.getElementById('footerSuccessMessage').classList.remove('hidden');
-
-
-            const phoneNumberInput = document.getElementById('phoneNumber');
-            const searchBtn = document.getElementById('searchBtn');
-            const phoneNumberResultStatus = document.getElementById('phoneNumberResultStatus');
-            const mainResultContent = document.getElementById('mainResultContent');
-            const deliveryRatioValue = document.getElementById('deliveryRatioValue');
-            const deliveryRatioLabel = document.getElementById('deliveryRatioLabel');
-            const totalOrders = document.getElementById('totalOrders');
-            const totalDelivered = document.getElementById('totalDelivered');
-            const totalCancelled = document.getElementById('totalCancelled');
-            const deliveryRate = document.getElementById('deliveryRate');
-            const courierTableBody = document.getElementById('courierTableBody');
-            const noDataRow = document.getElementById('noDataRow');
-            const circularProgress = document.querySelector('.circular-progress');
-
-            searchBtn.addEventListener('click', async function() {
-                const phoneNumber = phoneNumberInput.value.trim();
-
-                if (!phoneNumber || !/^01[3-9]\d{8}$/.test(phoneNumber)) {
-                    alert('অনুগ্রহ করে একটি সঠিক বাংলাদেশী ফোন নম্বর লিখুন (যেমন: 01751266060)');
-                    return;
-                }
-
-                // Show loading state
-                searchBtn.disabled = true;
-                searchBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Searching...';
-                phoneNumberResultStatus.classList.add('hidden'); // Hide any previous status
-                mainResultContent.classList.add('hidden'); // Hide previous results
-                noDataRow.classList.add('hidden'); // Hide no data message
-
-                try {
-                    // This fetch call remains GET with query parameters to match your working api/check.js
-                    const response = await fetch(`/api/check?phone=${encodeURIComponent(phoneNumber)}`);
-                    const data = await response.json();
-
-                    // Check for successful response from your API and BD Courier API's status
-                    if (response.status !== 200 || data.status !== 'success' || !data.data) {
-                        // Display error/no data message
-                        phoneNumberResultStatus.textContent = `${phoneNumber} - কোনো স্মার্ট রিপোর্ট পাওয়া যায়নি!`;
-                        phoneNumberResultStatus.classList.remove('alert-info');
-                        phoneNumberResultStatus.classList.add('alert-warning'); // Change to warning for no data
-                        phoneNumberResultStatus.classList.remove('hidden');
-                        
-                        // Hide main content
-                        mainResultContent.classList.add('hidden');
-
-                        // Reset summary and courier table for no data case
-                        deliveryRatioValue.textContent = '0.0%';
-                        circularProgress.style.setProperty('--progress', '0%');
-                        deliveryRatioLabel.textContent = '';
-                        totalOrders.textContent = '0';
-                        totalDelivered.textContent = '0';
-                        totalCancelled.textContent = '0';
-                        deliveryRate.textContent = '0%';
-                        courierTableBody.innerHTML = ''; // Clear table
-                        noDataRow.classList.remove('hidden'); // Show no data message in table
-                        return;
-                    }
-
-                    // Show success message and results
-                    phoneNumberResultStatus.textContent = `${phoneNumber} - স্মার্ট রিপোর্ট পাওয়া গেছে!`;
-                    phoneNumberResultStatus.classList.remove('alert-warning');
-                    phoneNumberResultStatus.classList.add('alert-info');
-                    phoneNumberResultStatus.classList.remove('hidden');
-                    mainResultContent.classList.remove('hidden');
-
-
-                    // Update Summary
-                    const summary = data.data.summary || {
-                        total_parcel: 0,
-                        success_parcel: 0,
-                        cancelled_parcel: 0,
-                        success_ratio: 0
-                    };
-
-                    totalOrders.textContent = summary.total_parcel;
-                    totalDelivered.textContent = summary.success_parcel;
-                    totalCancelled.textContent = summary.cancelled_parcel;
-                    deliveryRate.textContent = `${summary.success_ratio.toFixed(2)}%`;
-
-                    // Update Circular Progress
-                    const progressPercentage = parseFloat(summary.success_ratio); // Ensure it's a number
-                    deliveryRatioValue.textContent = `${progressPercentage.toFixed(1)}%`; // Shows one decimal
-                    circularProgress.style.setProperty('--progress', `${progressPercentage}%`);
-                    
-                    if (progressPercentage >= 80) {
-                        deliveryRatioLabel.textContent = 'Excellent';
-                        circularProgress.style.setProperty('--progress', `${progressPercentage}%`);
-                    } else if (progressPercentage >= 50) {
-                        deliveryRatioLabel.textContent = 'Good';
-                        circularProgress.style.setProperty('--progress', `${progressPercentage}%`);
-                    } else {
-                        deliveryRatioLabel.textContent = 'Poor';
-                        circularProgress.style.setProperty('--progress', `${progressPercentage}%`);
-                    }
-
-
-                    // Update Courier Table
-                    courierTableBody.innerHTML = ''; // Clear previous data
-                    noDataRow.classList.add('hidden'); // Hide no data message
-
-                    const couriers = [
-                        {key: 'pathao', name: 'Pathao', logo: 'https://seeklogo.com/images/P/pathao-logo-A27D791A04-seeklogo.com.png'},
-                        {key: 'steadfast', name: 'Steadfast', logo: 'https://steadfast.com.bd/assets/logo.png'},
-                        {key: 'parceldex', name: 'ParcelDex', logo: 'https://parceldex.com/assets/images/logo.png'},
-                        {key: 'redx', name: 'REDX', logo: 'https://redx.com.bd/assets/img/redx-logo.png'},
-                        {key: 'paperfly', name: 'Paperfly', logo: 'https://paperfly.com.bd/wp-content/uploads/2021/01/cropped-Paperfly_Logo-300x300.png'}
-                    ];
-
-                    let hasCourierData = false;
-                    couriers.forEach(item => {
-                        const courierData = data.data[item.key];
-                        if (courierData && courierData.total_parcel > 0) {
-                            hasCourierData = true;
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td><img src="${item.logo}" alt="${item.name}" class="courier-logo" onerror="this.style.display='none'"> ${item.name}</td>
-                                <td>${courierData.total_parcel}</td>
-                                <td>${courierData.success_parcel}</td>
-                                <td>${courierData.cancelled_parcel}</td>
-                                <td>${courierData.success_ratio.toFixed(2)}%</td>
-                            `;
-                            courierTableBody.appendChild(row);
-                        }
-                    });
-
-                    if (!hasCourierData) {
-                        noDataRow.classList.remove('hidden'); // Show no data message if no courier data
-                    }
-
-                } catch (error) {
-                    alert('তথ্য আনতে সমস্যা হয়েছে: ' + error.message);
-                    console.error('Fetch Error:', error);
-                    // Display general error message
-                    phoneNumberResultStatus.textContent = `${phoneNumber} - তথ্য আনতে সমস্যা হয়েছে!`;
-                    phoneNumberResultStatus.classList.remove('alert-info');
-                    phoneNumberResultStatus.classList.add('alert-danger');
-                    phoneNumberResultStatus.classList.remove('hidden');
-                    mainResultContent.classList.add('hidden'); // Keep results hidden on error
-                } finally {
-                    // Reset button state
-                    searchBtn.disabled = false;
-                    searchBtn.innerHTML = '<i class="fas fa-search me-2"></i> Search';
-                }
-            });
+          `;
         });
-    </script>
+
+      } catch (err) {
+        console.error(err);
+        resultDiv.innerHTML = '<p style="color:red;">Error fetching data.</p>';
+      }
+    }
+  </script>
 </body>
 </html>
