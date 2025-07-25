@@ -21,9 +21,18 @@
       background: white;
       padding: 20px;
       border-radius: 8px;
-      max-width: 400px;
+      max-width: 500px;
       margin-left: auto;
       margin-right: auto;
+      text-align: left;
+    }
+    .courier {
+      border-bottom: 1px solid #ddd;
+      padding: 10px 0;
+    }
+    .courier img {
+      vertical-align: middle;
+      margin-right: 8px;
     }
   </style>
 </head>
@@ -33,40 +42,50 @@
   <button onclick="checkCourier()">Search</button>
   <div class="result" id="result"></div>
 
-<script>
-  async function checkCourier() {
-    const phone = document.getElementById('phone').value;
-    const resultDiv = document.getElementById('result');
-    if (!phone) {
-      resultDiv.innerHTML = '<p style="color:red;">Please enter a phone number.</p>';
-      return;
-    }
-
-    resultDiv.innerHTML = 'Checking...';
-
-    try {
-      const res = await fetch(`/api/check?phone=${phone}`);
-      const data = await res.json();
-      console.log('API response:', data); // 👈 Debug line
-
-      if (data.error || !data.data) {
-        resultDiv.innerHTML = `<p style="color:red;">${data.error || 'Invalid response'}</p>`;
-      } else {
-        const { success, cancel, return: returned } = data.data;
-
-        resultDiv.innerHTML = `
-          <h3>Phone: ${phone}</h3>
-          <p>✅ Delivered: <strong>${success}</strong></p>
-          <p>❌ Cancelled: <strong>${cancel}</strong></p>
-          <p>↩️ Returned: <strong>${returned}</strong></p>
-        `;
+  <script>
+    async function checkCourier() {
+      const phone = document.getElementById('phone').value;
+      const resultDiv = document.getElementById('result');
+      if (!phone) {
+        resultDiv.innerHTML = '<p style="color:red;">Please enter a phone number.</p>';
+        return;
       }
-    } catch (err) {
-      console.error('Fetch error:', err);
-      resultDiv.innerHTML = '<p style="color:red;">Error fetching data.</p>';
-    }
-  }
-</script>
 
+      resultDiv.innerHTML = '🔄 Checking...';
+
+      try {
+        const res = await fetch(`/api/check?phone=${phone}`);
+        const data = await res.json();
+
+        if (data.status !== 'success' || !data.courierData) {
+          resultDiv.innerHTML = `<p style="color:red;">Invalid response</p>`;
+          return;
+        }
+
+        const courierData = data.courierData;
+        resultDiv.innerHTML = `<h3>📱 Phone: ${phone}</h3><hr/>`;
+
+        Object.keys(courierData).forEach(key => {
+          if (key === "summary") return;
+
+          const c = courierData[key];
+          resultDiv.innerHTML += `
+            <div class="courier">
+              <img src="${c.logo}" width="40" />
+              <strong>${c.name}</strong><br/>
+              📦 Total: ${c.total_parcel}<br/>
+              ✅ Success: ${c.success_parcel}<br/>
+              ❌ Cancelled: ${c.cancelled_parcel}<br/>
+              🔢 Success Rate: ${c.success_ratio}%
+            </div>
+          `;
+        });
+
+      } catch (err) {
+        console.error(err);
+        resultDiv.innerHTML = '<p style="color:red;">Error fetching data.</p>';
+      }
+    }
+  </script>
 </body>
 </html>
